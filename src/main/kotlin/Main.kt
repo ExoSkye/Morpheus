@@ -55,7 +55,7 @@ class Listener : morpheusBaseListener() {
     }
 
     override fun enterExit(ctx: morpheusParser.ExitContext?) {
-
+        throw Exception("Exiting...")
     }
 }
 
