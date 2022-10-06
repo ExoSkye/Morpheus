@@ -1,6 +1,5 @@
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
-import org.antlr.v4.runtime.RuleContext
 import org.antlr.v4.runtime.tree.ParseTree
 import org.antlr.v4.runtime.tree.ParseTreeWalker
 
@@ -46,12 +45,7 @@ class Listener(val debug: Boolean) : morpheusBaseListener() {
     }
 
     override fun enterInst(ctx: morpheusParser.InstContext?) {
-        if (!statement_updated) {
-            statement += 1
-        }
-        else {
-            statement_updated = false
-        }
+        statement += 1
     }
     override fun enterPrint(ctx: morpheusParser.PrintContext) {
         val reg_num = parse_number(ctx.getChild(2))
@@ -67,20 +61,21 @@ class Listener(val debug: Boolean) : morpheusBaseListener() {
     }
 
     override fun enterAdd_reg(ctx: morpheusParser.Add_regContext) {
-        val reg_a_num = parse_number(ctx.getChild(4))
-        val reg_b_num = parse_number(ctx.getChild(6))
-        debugPrint(reg_a_num, reg_b_num, "add register")
+        val reg_a_num = parse_number(ctx.getChild(6))
+        val reg_b_num = parse_number(ctx.getChild(4))
+        debugPrint("add register", reg_a_num, reg_b_num)
         regs[reg_a_num] += regs[reg_b_num]
     }
 
     override fun enterSub_reg(ctx: morpheusParser.Sub_regContext) {
         val reg_a_num = parse_number(ctx.getChild(5))
         val reg_b_num = parse_number(ctx.getChild(7))
-        debugPrint(reg_a_num, reg_b_num, "subtract register")
+        debugPrint("subtract register", reg_a_num, reg_b_num)
         regs[reg_a_num] -= regs[reg_b_num]
     }
 
     override fun enterReset_reg(ctx: morpheusParser.Reset_regContext) {
+        debugPrint("reset register", parse_number(ctx.getChild(3)))
         regs[parse_number(ctx.getChild(3))] = 0
     }
 
@@ -117,11 +112,12 @@ class Listener(val debug: Boolean) : morpheusBaseListener() {
     }
 
     override fun enterCopy_reg(ctx: morpheusParser.Copy_regContext) {
-        regs[parse_number(ctx.getChild(5))] = regs[parse_number(ctx.getChild(7))]
+        debugPrint("copy register", parse_number(ctx.getChild(5)), parse_number(ctx.getChild(7)))
+        regs[parse_number(ctx.getChild(7))] = regs[parse_number(ctx.getChild(5))]
     }
 }
 
-fun main(args: Array<String>) {
+fun main() {
     val filename = System.getenv("FILENAME") ?: "failed"
     if (filename == "failed") {
         println("Please define file to run via the FILENAME env variable")
