@@ -16,10 +16,12 @@ read                : YOWL YOWL SEP number;
 
 // MATHS
 
-maths_inst          : maths SEP (add | sub | reset_reg | copy_reg);
+maths_inst          : maths SEP (add | sub | add_reg | sub_reg | reset_reg | copy_reg);
 
 add                 : YOWL YOWL SEP number SEP number;
 sub                 : YOWL YOWL YOWL SEP number SEP number;
+add_reg             : YOWL YOWL SEP SEP number SEP number;
+sub_reg             : YOWL YOWL YOWL SEP SEP number SEP number;
 reset_reg           : YOWL SEP number;
 copy_reg            : YOWL YOWL YOWL YOWL SEP number SEP number;
 

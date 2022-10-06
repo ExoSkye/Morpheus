@@ -1,5 +1,6 @@
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
+import org.antlr.v4.runtime.RuleContext
 import org.antlr.v4.runtime.tree.ParseTree
 import org.antlr.v4.runtime.tree.ParseTreeWalker
 
@@ -21,7 +22,7 @@ fun parse_number(num: ParseTree): Int {
 class Listener(val debug: Boolean) : morpheusBaseListener() {
     var regs = Array(64) { 0 }
     var statement = 0
-
+    var statement_updated = false
 
     fun debugPrint(message: String) {
         if (debug) {
@@ -36,12 +37,20 @@ class Listener(val debug: Boolean) : morpheusBaseListener() {
         debugPrint("Running ${optype} with the register ${reg} (value = ${regs[reg]})")
     }
 
+    fun debugPrint(imm: Int, optype: String) {
+        debugPrint("Running ${optype} with the immediate value ${imm}")
+    }
+
     fun debugPrint(reg: Int, imm: Int, optype: String) {
         debugPrint("Running ${optype} with the register ${reg} (value = ${regs[reg]}) and immediate value ${imm}")
     }
+
     override fun enterInst(ctx: morpheusParser.InstContext?) {
-        if (debug) {
+        if (!statement_updated) {
             statement += 1
+        }
+        else {
+            statement_updated = false
         }
     }
     override fun enterPrint(ctx: morpheusParser.PrintContext) {
@@ -57,33 +66,54 @@ class Listener(val debug: Boolean) : morpheusBaseListener() {
         regs[reg_num] += imm_val
     }
 
+    override fun enterAdd_reg(ctx: morpheusParser.Add_regContext) {
+        val reg_a_num = parse_number(ctx.getChild(4))
+        val reg_b_num = parse_number(ctx.getChild(6))
+        debugPrint(reg_a_num, reg_b_num, "add register")
+        regs[reg_a_num] += regs[reg_b_num]
+    }
+
+    override fun enterSub_reg(ctx: morpheusParser.Sub_regContext) {
+        val reg_a_num = parse_number(ctx.getChild(5))
+        val reg_b_num = parse_number(ctx.getChild(7))
+        debugPrint(reg_a_num, reg_b_num, "subtract register")
+        regs[reg_a_num] -= regs[reg_b_num]
+    }
+
     override fun enterReset_reg(ctx: morpheusParser.Reset_regContext) {
         regs[parse_number(ctx.getChild(3))] = 0
     }
 
     override fun enterSub(ctx: morpheusParser.SubContext) {
-        regs[parse_number(ctx.getChild(4))] -= parse_number(ctx.getChild(6))
+        val reg_num = parse_number(ctx.getChild(4))
+        val imm_val = parse_number(ctx.getChild(6))
+        debugPrint("subtract", reg_num, imm_val)
+        regs[reg_num] -= imm_val
     }
 
     override fun enterGoto_uncond(ctx: morpheusParser.Goto_uncondContext) {
-        val walker = ParseTreeWalker()
-        walker.walk(this, ctx.parent.parent.parent.getChild(parse_number(ctx.getChild(3)) - 1))
+        debugPrint(parse_number(ctx.getChild(3)), "goto")
+        statement = parse_number(ctx.getChild(3))
+        statement_updated = true
     }
 
     override fun enterGoto_if_zero(ctx: morpheusParser.Goto_if_zeroContext) {
-        if (regs[parse_number(ctx.getChild(5))] == 0) {
-            val walker = ParseTreeWalker()
-            walker.walk(this, ctx.parent.parent.parent.getChild(parse_number(ctx.getChild(3)) - 1))
+        debugPrint(parse_number(ctx.getChild(5)), parse_number(ctx.getChild(3)), "goto")
+        if (regs[parse_number(ctx.getChild(3))] == 0) {
+            statement = parse_number(ctx.getChild(5))
+            statement_updated = true
         }
     }
 
     override fun enterRead(ctx: morpheusParser.ReadContext) {
+        debugPrint("read", parse_number(ctx.getChild(3)))
         print("> ")
         regs[parse_number(ctx.getChild(3))] = wait_for_input().toInt()
     }
 
     override fun enterExit(ctx: morpheusParser.ExitContext?) {
-        throw Exception("Exiting...")
+        debugPrint("Exiting")
+        statement = -1
     }
 
     override fun enterCopy_reg(ctx: morpheusParser.Copy_regContext) {
@@ -104,8 +134,12 @@ fun main(args: Array<String>) {
     val tokens = CommonTokenStream(lexer)
     val parser = morpheusParser(tokens)
     parser.buildParseTree = true
+
     val listener = Listener((System.getenv("DEBUG") ?: "0") == "1")
     val entrypoint = parser.morpheus_script()
-    val walker = ParseTreeWalker()
-    walker.walk(listener, entrypoint)
+    while (listener.statement != -1) {
+        val node = entrypoint.getChild(listener.statement)
+        val walker = ParseTreeWalker()
+        walker.walk(listener, node)
+    }
 }
