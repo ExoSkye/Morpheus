@@ -1,3 +1,4 @@
+import org.antlr.v4.runtime.CharStream
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.tree.ParseTree
@@ -117,6 +118,23 @@ class Listener(val debug: Boolean) : morpheusBaseListener() {
     }
 }
 
+fun run_script(script: CharStream, debug: Boolean): Listener {
+    val lexer = morpheusLexer(script)
+    val tokens = CommonTokenStream(lexer)
+    val parser = morpheusParser(tokens)
+    parser.buildParseTree = true
+
+    val listener = Listener(debug)
+    val entrypoint = parser.morpheus_script()
+    while (listener.statement != -1) {
+        val node = entrypoint.getChild(listener.statement)
+        val walker = ParseTreeWalker()
+        walker.walk(listener, node)
+    }
+
+    return listener
+}
+
 fun main() {
     val filename = System.getenv("FILENAME") ?: "failed"
     if (filename == "failed") {
@@ -126,16 +144,5 @@ fun main() {
 
     val file = CharStreams.fromFileName(filename)
 
-    val lexer = morpheusLexer(file)
-    val tokens = CommonTokenStream(lexer)
-    val parser = morpheusParser(tokens)
-    parser.buildParseTree = true
-
-    val listener = Listener((System.getenv("DEBUG") ?: "0") == "1")
-    val entrypoint = parser.morpheus_script()
-    while (listener.statement != -1) {
-        val node = entrypoint.getChild(listener.statement)
-        val walker = ParseTreeWalker()
-        walker.walk(listener, node)
-    }
+    run_script(file, (System.getenv("DEBUG") ?: "0") == "1")
 }
