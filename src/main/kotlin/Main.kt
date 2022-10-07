@@ -75,8 +75,8 @@ class Listener(val debug: Boolean) : morpheusBaseListener() {
     }
 
     override fun enterReset_reg(ctx: morpheusParser.Reset_regContext) {
-        debugPrint("reset register", parse_number(ctx.getChild(3)))
-        regs[parse_number(ctx.getChild(3))] = 0
+        debugPrint("reset register", parse_number(ctx.getChild(2)))
+        regs[parse_number(ctx.getChild(2))] = 0
     }
 
     override fun enterSub(ctx: morpheusParser.SubContext) {
