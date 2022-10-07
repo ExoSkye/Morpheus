@@ -3,16 +3,19 @@ grammar morpheus;
 YOWL                : 'yowl';
 SEP                 : ':';
 NEWLINE             : [\r\n]+ -> skip;
-COMMENT             : '//' ~('\r' | '\n')* NEWLINE? -> skip ;
+WHITESPACE          : [ \t]+ -> skip;
+COMMENT             : '//' ~('\r' | '\n')* NEWLINE? '//' -> skip;
 
 inst                : (io_inst | maths_inst | control_inst)? SEP;
 
 // IO
 
-io_inst             : io SEP (print | read);
+io_inst             : io SEP (print | read | print_char | read_char);
 
 print               : YOWL SEP number;
 read                : YOWL YOWL SEP number;
+print_char          : YOWL SEP SEP number;
+read_char           : YOWL YOWL SEP SEP number;
 
 // MATHS
 
@@ -29,7 +32,7 @@ copy_reg            : YOWL YOWL YOWL YOWL SEP number SEP number;
 
 control_inst        : control SEP (goto_uncond | goto_if_zero | exit);
 
-goto_uncond         : YOWL YOWL SEP number;
+goto_uncond         : YOWL YOWL YOWL SEP number;
 goto_if_zero        : YOWL YOWL SEP number SEP number;
 exit                : YOWL;
 
@@ -42,4 +45,4 @@ io                  : YOWL YOWL YOWL;
 maths               : YOWL YOWL;
 control             : YOWL;
 
-morpheus_script     : inst+ EOF;
+morpheus_script     : inst* EOF;

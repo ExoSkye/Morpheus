@@ -77,16 +77,16 @@ class OperationTests {
     @Test
     fun test_goto() {
         val expected_regs: Array<Int> = Array(64) { 0 }
-        expected_regs[0] = 10
+        expected_regs[0] = 0
         expected_regs[1] = 10
         assert_regs(run_script(
             make_charstream(
-                "yowlyowl:yowlyowl::::::yowlyowlyowlyowlyowlyowlyowlyowlyowlyowl:" + 
-                "yowlyowl:yowlyowlyowl:::yowl:::yowl:" +
-                "yowlyowl:yowlyowl:::yowl::::" +
-                "yowl:yowlyowl:::yowlyowlyowlyowlyowlyowl:::yowl:" +
-                "yowl:yowlyowl:::yowlyowl:" +
-                "yowl:yowl:"
+                "yowlyowl:yowlyowl::::::yowlyowlyowlyowlyowlyowlyowlyowlyowlyowl:" +  // add 10 to reg 0
+                "yowlyowl:yowlyowl:::yowl:::yowl:" + // add 1 to reg 1
+                "yowlyowl:yowlyowlyowl::::::yowl:" + // subtract 1 from reg 0
+                "yowl:yowlyowl:::yowlyowlyowlyowlyowl::::" + // goto line 6 if reg 0 is 0
+                "yowl:yowlyowlyowl:::yowl:" + // goto line 2
+                "yowl:yowl:" // exit
             ), true), expected_regs)
     }
 }

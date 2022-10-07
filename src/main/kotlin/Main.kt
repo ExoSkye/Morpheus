@@ -22,7 +22,6 @@ fun parse_number(num: ParseTree): Int {
 class Listener(val debug: Boolean) : morpheusBaseListener() {
     var regs = Array(64) { 0 }
     var statement = 0
-    var statement_updated = false
 
     fun debugPrint(message: String) {
         if (debug) {
@@ -88,16 +87,14 @@ class Listener(val debug: Boolean) : morpheusBaseListener() {
     }
 
     override fun enterGoto_uncond(ctx: morpheusParser.Goto_uncondContext) {
-        debugPrint(parse_number(ctx.getChild(3)), "goto")
-        statement = parse_number(ctx.getChild(3))
-        statement_updated = true
+        debugPrint(parse_number(ctx.getChild(4)), "goto")
+        statement = parse_number(ctx.getChild(4))
     }
 
     override fun enterGoto_if_zero(ctx: morpheusParser.Goto_if_zeroContext) {
-        debugPrint(parse_number(ctx.getChild(5)), parse_number(ctx.getChild(3)), "goto")
-        if (regs[parse_number(ctx.getChild(3))] == 0) {
-            statement = parse_number(ctx.getChild(5))
-            statement_updated = true
+        debugPrint(parse_number(ctx.getChild(5)), parse_number(ctx.getChild(3)), "conditional goto")
+        if (regs[parse_number(ctx.getChild(5))] == 0) {
+            statement = parse_number(ctx.getChild(3))
         }
     }
 
@@ -113,8 +110,19 @@ class Listener(val debug: Boolean) : morpheusBaseListener() {
     }
 
     override fun enterCopy_reg(ctx: morpheusParser.Copy_regContext) {
-        debugPrint("copy register", parse_number(ctx.getChild(5)), parse_number(ctx.getChild(7)))
-        regs[parse_number(ctx.getChild(7))] = regs[parse_number(ctx.getChild(5))]
+        debugPrint("copy register", parse_number(ctx.getChild(7)), parse_number(ctx.getChild(5)))
+        regs[parse_number(ctx.getChild(5))] = regs[parse_number(ctx.getChild(7))]
+    }
+
+    override fun enterPrint_char(ctx: morpheusParser.Print_charContext) {
+        debugPrint("print char", parse_number(ctx.getChild(3)))
+        print(regs[parse_number(ctx.getChild(3))].toChar())
+    }
+
+    override fun exitRead_char(ctx: morpheusParser.Read_charContext) {
+        debugPrint("read char", parse_number(ctx.getChild(3)))
+        print("> ")
+        regs[parse_number(ctx.getChild(3))] = wait_for_input().first().code
     }
 }
 

@@ -1,0 +1,6 @@
+yowlyowlyowl:yowlyowl::::            // Read from STDIN to register 0 //
+yowlyowl:yowlyowlyowlyowl:::yowl:::: // Copy register 0 to 1 //
+yowlyowl:yowlyowlyowl::::::yowl:     // Subtract 1 from register 0 and store in register 0 //
+yowlyowlyowl:yowl:::yowl:            // Print register 1 //
+yowl:yowlyowl:::yowlyowlyowl::::     // Goto statement 4 if register 0 is 0 (0 - 1 = -1 and 1 - 1 = 0 so this jumps back to the print and acts like a loop) //
+yowl:yowl:                           // If it passes the goto (ie 0 was entered), then exit //
