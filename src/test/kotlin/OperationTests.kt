@@ -16,8 +16,6 @@ class OperationTests {
         }
     }
 
-
-
     @Test
     fun test_add() {
         val expected_regs: Array<Int> = Array(64) { 0 }
@@ -27,9 +25,9 @@ class OperationTests {
         assert_regs(run_script(
             make_charstream(
                 "yowlyowl:yowlyowl::::::yowl:" +
-                    "yowlyowl:yowlyowl:::yowl:::yowlyowl:" +
-                    "yowlyowl:yowlyowl:::yowlyowl:::yowlyowlyowl:" +
-                    "yowl:yowl:"
+                "yowlyowl:yowlyowl:::yowl:::yowlyowl:" +
+                "yowlyowl:yowlyowl:::yowlyowl:::yowlyowlyowl:" +
+                "yowl:yowl:"
         ), true), expected_regs)
     }
 
@@ -39,12 +37,56 @@ class OperationTests {
         assert_regs(run_script(
             make_charstream(
                 "yowlyowl:yowlyowl::::::yowl:" +
-                        "yowlyowl:yowlyowl:::yowl:::yowlyowl:" +
-                        "yowlyowl:yowlyowl:::yowlyowl:::yowlyowlyowl:" +
-                        "yowlyowl:yowlyowlyowl::::::yowl:" +
-                        "yowlyowl:yowlyowlyowl:::yowl:::yowlyowl:" +
-                        "yowlyowl:yowlyowlyowl:::yowlyowl:::yowlyowlyowl:" +
-                        "yowl:yowl:"
+                "yowlyowl:yowlyowl:::yowl:::yowlyowl:" +
+                "yowlyowl:yowlyowl:::yowlyowl:::yowlyowlyowl:" +
+                "yowlyowl:yowlyowlyowl::::::yowl:" +
+                "yowlyowl:yowlyowlyowl:::yowl:::yowlyowl:" +
+                "yowlyowl:yowlyowlyowl:::yowlyowl:::yowlyowlyowl:" +
+                "yowl:yowl:"
+            ), true), expected_regs)
+    }
+
+    @Test
+    fun test_add_reg() {
+        val expected_regs: Array<Int> = Array(64) { 0 }
+        expected_regs[0] = 1
+        expected_regs[1] = 3
+        assert_regs(run_script(
+            make_charstream(
+                "yowlyowl:yowlyowl::::::yowl:" +
+                "yowlyowl:yowlyowl:::yowl:::yowlyowl:" +
+                "yowlyowl:yowlyowl:::::::yowl:" +
+                "yowl:yowl:"
+            ), true), expected_regs)
+    }
+
+    @Test
+    fun test_sub_reg() {
+        val expected_regs: Array<Int> = Array(64) { 0 }
+        expected_regs[0] = 1
+        expected_regs[1] = 1
+        assert_regs(run_script(
+            make_charstream(
+                "yowlyowl:yowlyowl::::::yowl:" +
+                "yowlyowl:yowlyowl:::yowl:::yowlyowl:" +
+                "yowlyowl:yowlyowlyowl::::yowl::::" +
+                "yowl:yowl:"
+            ), true), expected_regs)
+    }
+
+    @Test
+    fun test_goto() {
+        val expected_regs: Array<Int> = Array(64) { 0 }
+        expected_regs[0] = 10
+        expected_regs[1] = 10
+        assert_regs(run_script(
+            make_charstream(
+                "yowlyowl:yowlyowl::::::yowlyowlyowlyowlyowlyowlyowlyowlyowlyowl:" + 
+                "yowlyowl:yowlyowlyowl:::yowl:::yowl:" +
+                "yowlyowl:yowlyowl:::yowl::::" +
+                "yowl:yowlyowl:::yowlyowlyowlyowlyowlyowl:::yowl:" +
+                "yowl:yowlyowl:::yowlyowl:" +
+                "yowl:yowl:"
             ), true), expected_regs)
     }
 }

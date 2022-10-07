@@ -57,7 +57,7 @@ class Listener(val debug: Boolean) : morpheusBaseListener() {
     override fun enterAdd(ctx: morpheusParser.AddContext) {
         val reg_num = parse_number(ctx.getChild(3))
         val imm_val = parse_number(ctx.getChild(5))
-        debugPrint("add", reg_num, imm_val)
+        debugPrint(reg_num, imm_val, "add")
         regs[reg_num] += imm_val
     }
 
@@ -83,7 +83,7 @@ class Listener(val debug: Boolean) : morpheusBaseListener() {
     override fun enterSub(ctx: morpheusParser.SubContext) {
         val reg_num = parse_number(ctx.getChild(4))
         val imm_val = parse_number(ctx.getChild(6))
-        debugPrint("subtract", reg_num, imm_val)
+        debugPrint(reg_num, imm_val, "subtract")
         regs[reg_num] -= imm_val
     }
 
