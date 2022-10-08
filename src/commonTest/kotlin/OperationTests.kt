@@ -1,8 +1,7 @@
-import org.antlr.v4.runtime.CharStream
-import org.antlr.v4.runtime.CharStreams
-import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
+import org.antlr.v4.kotlinruntime.CharStream
+import org.antlr.v4.kotlinruntime.CharStreams
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class OperationTests {
 
@@ -22,7 +21,7 @@ class OperationTests {
         expected_regs[0] = 1
         expected_regs[1] = 2
         expected_regs[2] = 3
-        assert_regs(run_script(
+        assert_regs(runScript(
             make_charstream(
                 "yowlyowl:yowlyowl::::::yowl:" +
                 "yowlyowl:yowlyowl:::yowl:::yowlyowl:" +
@@ -34,7 +33,7 @@ class OperationTests {
     @Test
     fun test_sub() {
         val expected_regs: Array<Int> = Array(64) { 0 }
-        assert_regs(run_script(
+        assert_regs(runScript(
             make_charstream(
                 "yowlyowl:yowlyowl::::::yowl:" +
                 "yowlyowl:yowlyowl:::yowl:::yowlyowl:" +
@@ -51,7 +50,7 @@ class OperationTests {
         val expected_regs: Array<Int> = Array(64) { 0 }
         expected_regs[0] = 1
         expected_regs[1] = 3
-        assert_regs(run_script(
+        assert_regs(runScript(
             make_charstream(
                 "yowlyowl:yowlyowl::::::yowl:" +
                 "yowlyowl:yowlyowl:::yowl:::yowlyowl:" +
@@ -65,7 +64,7 @@ class OperationTests {
         val expected_regs: Array<Int> = Array(64) { 0 }
         expected_regs[0] = 1
         expected_regs[1] = 1
-        assert_regs(run_script(
+        assert_regs(runScript(
             make_charstream(
                 "yowlyowl:yowlyowl::::::yowl:" +
                 "yowlyowl:yowlyowl:::yowl:::yowlyowl:" +
@@ -79,7 +78,7 @@ class OperationTests {
         val expected_regs: Array<Int> = Array(64) { 0 }
         expected_regs[0] = 0
         expected_regs[1] = 10
-        assert_regs(run_script(
+        assert_regs(runScript(
             make_charstream(
                 "yowlyowl:yowlyowl::::::yowlyowlyowlyowlyowlyowlyowlyowlyowlyowl:" +  // add 10 to reg 0
                 "yowlyowl:yowlyowl:::yowl:::yowl:" + // add 1 to reg 1
